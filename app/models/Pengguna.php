@@ -11,23 +11,6 @@ class Pengguna
     private string $namaLengkap;
     private TipePengguna $tipePengguna;
 
-    // Constructor
-    public function __construct(string $username, string $passwordHash, string $email, string $noTelp, string $namaLengkap, string $tipePengguna)
-    {
-        $this->username = $username;
-        $this->passwordHash = $passwordHash;
-        $this->email = $email;
-        $this->noTelp = $noTelp;
-        $this->namaLengkap = $namaLengkap;
-        if ($tipePengguna == TipePengguna::Tamu->name) {
-            $this->tipePengguna = TipePengguna::Tamu;
-        } else if ($tipePengguna == TipePengguna::Staff->name) {
-            $this->tipePengguna = TipePengguna::Staff;
-        } else {
-            $this->tipePengguna = TipePengguna::Manager;
-        }
-    }
-
     // Getters & Setters
     public function getUsername(): string
     {
