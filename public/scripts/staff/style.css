@@ -1,0 +1,287 @@
+/*import Poppins font*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+/*dark mode*/
+:root.dark{
+  --base-clr: #11121a;
+  --line-clr: #42434a;
+  --hover-clr: #222533;
+  --text-clr: #e6e6ef;
+  --accent-clr: #5e63ff;
+  --secondary-text-clr: #b0b3c1;
+  --table-header-clr: #1a1d2a;
+  --secondary-table-clr: #15161f;
+  --edit-btn-clr: #a85f1b;
+  --danger-clr: #ff4d4d;
+}
+/*light mode*/
+:root:not(.dark){
+  --base-clr: #fafafa;
+  --line-clr: #2a2a2b;
+  --hover-clr: #d3d3d3;
+  --text-clr: #010203;
+  --accent-clr: #5e63ff;
+  --secondary-text-clr: #14151f;
+  --table-header-clr: #d3d3d3;
+  --secondary-table-clr: #f1f1f1;
+  --edit-btn-clr: #a85f1b;
+  --danger-clr: #ff4d4d;
+}
+/*no preset margin/padding*/
+*{
+  margin: 0;
+  padding: 0;
+}
+/*font stuffs*/
+html{
+  font-family: Poppins, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5rem;
+}
+body{
+  min-height: 100dvh;
+  min-height: 100vh;
+  background-color: var(--base-clr);
+  color: var(--text-clr);
+  display: grid;
+  /*auto for sidebar, 1fr for <main>*/
+  grid-template-columns: auto 1fr;
+}
+#sidebar{
+  box-sizing: border-box;
+  /*covers top-bottom*/
+  min-height: 100vh;
+  width: 300px;
+  padding: 5px 1em;
+  background-color: var(--base-clr);
+  border-right: 1px solid var(--line-clr);
+  /*sticks when scrolled*/
+  position: sticky;
+  top: 0;
+  align-self: start;
+  /*transition when open/closing*/
+  transition: 300ms ease-in-out;
+  overflow: hidden;
+  text-wrap: nowrap;
+}
+/*sidebar when closed*/
+#sidebar.close{
+  padding: 5px;
+  width: 60px;
+}
+/*sidebar icons*/
+#sidebar svg{
+  flex-shrink: 0;
+  fill: var(--text-clr);
+}
+#sidebar .img-div{
+  width: 50px;
+  height: 45px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  margin-left: min(5px, 7%);
+  img {
+    max-height: 50px;
+  }
+}
+/*to make sure links/dropdown strecth all the way*/
+#sidebar a span, #sidebar .dropdown-btn span, #toggle-mode-btn span, #select-submit span, #select-all span{
+  flex-grow: 1;
+}
+/*links/dropdown hover*/
+#sidebar a:hover, #toggle-btn:hover, #sidebar button:not(#toggle-btn):hover{
+  background-color: var(--hover-clr);
+}
+/*dropdown, -default closed*/
+#sidebar .sub-menu{
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: 300ms ease-in-out;
+
+  > div {
+    overflow: hidden;
+  }
+}
+/*dropdowns when showed*/
+#sidebar .sub-menu.show{
+  grid-template-rows: 1fr;
+}
+/*dropdown up/down arrow transition*/
+.dropdown-btn svg{
+  transition: 200ms ease-in-out;
+}
+/*rotate arrow svgs*/
+.rotate svg:last-child{
+  rotate: 180deg;
+}
+/*consistency reasons?*/
+.sidebar .sub-menu a, .sidebar .sub-menu {
+  padding-left: 2em;
+}
+/*close sidebar btn*/
+#toggle-btn{
+  margin-left: auto;
+  padding: 1em;
+  border: none;
+  border-radius: .5em;
+  background: none;
+  cursor: pointer;
+
+  /*transtition*/
+  svg{
+    transition: rotate 150ms ease;
+  }
+}
+/*remove the dots on list*/
+#sidebar ul{
+  list-style: none;
+}
+/*main logo of links/dropdowns*/
+#sidebar > ul > li:first-child{
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+  .logo{
+    font-weight: 600;
+  }
+}
+/*bolds the active page on sidebar*/
+#sidebar ul li.active a{
+  color: var(--accent-clr);
+  svg{
+    fill: var(--accent-clr);
+  }
+}
+/*links/dropdown on sidebar*/
+#sidebar a, #select div, #sidebar button:not(#toggle-btn), #sidebar .logo, #select-all, #sidebar label{
+  border-radius: .5em;
+  padding: .85em;
+  text-decoration: none;
+  color: var(--text-clr);
+  display: flex;
+  align-items: center;
+  gap: 1em;
+}
+/*dropdown button --> same appearance as links*/
+#sidebar button:not(#toggle-btn), #select-submit, #select-all{
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+/*main content*/
+main{
+  /*main p*/
+  p{
+  color: var(--secondary-text-clr);
+  margin-top: 5px;
+  margin-bottom: 15px;
+  }
+}
+#container {
+  margin: 30px min(30px, 7%);
+}
+#table {
+  min-width: 100%;
+  border: 2px solid var(--line-clr);
+  border-collapse: collapse;
+  border-radius: 20px;
+  overflow: hidden;
+  tr#table-header {
+    background-color: var(--table-header-clr);
+    th {
+      color: var(--text-clr);
+    }
+  }
+  tr:nth-child(even) {
+    background-color: var(--base-clr);
+  }
+
+  tr:nth-child(odd) {
+    background-color: var(--secondary-table-clr);
+  }
+  td, th {
+    padding: .5em;
+    border: 2px solid var(--line-clr);
+    color: var(--secondary-text-clr);
+  }
+}
+
+#container-header{
+  height: 100px;
+  gap: 0.5em;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.form-container{
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid var(--line-clr);
+  background-color: var(--hover-clr);
+}
+.form-container label{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+.form-container button {
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: var(--accent-clr);
+  color: var(--text-clr);
+  border: none;
+}
+
+form#select-form label{
+  justify-content: flex-start;
+  gap: 0.5em;
+}
+
+.btn-container{
+  display: flex;
+  gap: min(3px, 1%);
+  justify-content: center;
+  align-items: center;
+}
+
+.edit-btn {
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: var(--edit-btn-clr);
+  color: var(--text-clr);
+  border: none;
+  width: 48%
+}
+
+.delete-btn {
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: var(--danger-clr);
+  color: var(--text-clr);
+  border: none;
+  width: 48%
+}
+
+header {
+  height: 100px;
+  display: flex;
+  padding: 0 min(30px, 7%);
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
+  gap: 1em;
+  border-bottom: 2px solid var(--line-clr);
+}
