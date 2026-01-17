@@ -175,46 +175,6 @@ main{
   z-index: 1;
 }
 
-.btn-container{
-  display: flex;
-  gap: 1%;
-  justify-content: center;
-  align-items: center;
-}
-
-.add-btn {
-  font-weight: bold;
-  text-align: center;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: var(--accent-clr);
-  color: var(--text-clr);
-  border: none;
-  margin-bottom: 1em;
-}
-
-.edit-btn {
-  font-weight: bold;
-  text-align: center;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: var(--edit-btn-clr);
-  color: var(--text-clr);
-  border: none;
-  width: 48%
-}
-
-.delete-btn {
-  font-weight: bold;
-  text-align: center;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: var(--danger-clr);
-  color: var(--text-clr);
-  border: none;
-  width: 48%
-}
-
 header {
   height: 100px;
   display: flex;
@@ -226,28 +186,90 @@ header {
   border-bottom: 2px solid var(--line-clr);
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.err-msg {
+  display: flex;
+  align-items: center;
+  color: var(--danger-clr);
+  border: 1px solid var(--danger-clr);
+  padding: 10px;
+  border-radius: 8px;
+  background-color: rgba(255, 77, 77, 0.1);
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 500;
+  svg {
+    fill: var(--danger-clr);
+    margin-right: 10px;
+  }
 }
 
-table thead tr, table tfoot tr {
-  background-color: var(--table-header-bg);
-  text-align: left;
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  max-width: 600px;
+  margin-top: 20px;
 }
 
-table th, table td {
-  padding: 12px 15px;
+.input-group {
+  display: flex;
+  flex-direction: column;
 }
 
-table tbody tr:nth-of-type(even) {
+label {
+  font-weight: 500;
+  color: var(--text-clr);
+}
+
+input, select, textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line-clr);
   background-color: var(--table-stripe-bg);
+  color: var(--text-clr);
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-table tbody tr:nth-of-type(odd) {
-  background-color: var(--base-clr);
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent-clr);
+  box-shadow: 0 0 0 2px rgba(94, 99, 255, 0.2);
 }
 
-table tbody tr:hover {
-  background-color: var(--table-hover-bg);
+select {
+  cursor: pointer;
+}
+
+::placeholder {
+  color: var(--secondary-text-clr);
+}
+
+.submit-form-btn {
+  margin-top: 1em;
+  text-align: center;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: var(--accent-clr);
+  color: var(--text-clr);
+  border: none;
+}
+
+select {
+    appearance: none; /* Removes the default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="white"><path d="M2 4l4 4 4-4"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    padding-right: 30px; /* Make room for the new icon */
+}
+
+/* Targets the calendar icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    /* Makes the icon secondary */
+    filter: invert(1) grayscale(1) brightness(2);
 }
