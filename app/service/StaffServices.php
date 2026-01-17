@@ -16,7 +16,7 @@ class StaffServices {
         $link = PDOUtil::createMySQLConnection();
         $query = "SELECT staff_id, username, password_hash, email, nama_staff, posisi, hire_date, resign_date FROM staff WHERE staff_id = ?";
         $stmt = $link->prepare($query);
-        $stmt -> bindParam(1,$staff_id);
+        $stmt -> bindParam(1,$username);
         $stmt->execute();
         $link=null;
         return $stmt->fetchObject(Staff::class);
