@@ -24,35 +24,33 @@ class StaffController
 
     public function verifyLogin() : void
     {
+        // Get from POST
         $username = trim(filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING));
         $password = trim(filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING));
+        $staff = $this->staffServices->getOneStaffByUsername($username);
+        // VALIDATE
         if (empty($username) || empty($password)) {
-            $errMessage = "Please fill all required fields";
+            $errMessage = "Please fill all required fields.";
+        } elseif (!$staff && $staff->getUsername() == null) {
+            $errMessage = "Incorrect username and password.";
+        }
+       elseif ($staff->getStatusAkun() != "Active" && !password_verify($password, $staff->getPasswordHash())) {
+            $errMessage = "Incorrect username and password.";
+        }
+        if (!empty($errMessage)) {
             header("Location: index.php?menu=login&message=" . $errMessage);
             exit;
+        // EXEC
         } else {
-            $staff = $this->staffServices->getOneStaffByUsername($username);
-            if ($staff && $staff->getUsername() != null) {
-                if ($staff->getStatusAkun() == "Active" && password_verify($password, $staff->getPasswordHash())) {
-                    $successMessage = "Login successfully";
-                    $_SESSION['username'] = $staff->getUsername();
-                    $_SESSION['posisi'] = $staff->getPosisi();
-                    $successMessage = "Login successfully! Welcome Back, " . $staff->getNamaStaff() . "!";
-                    if ($staff->getPosisi() == "Manager") {
-                        header("Location: index.php?menu=staff&success=" . $successMessage);
-                        exit;
-                    } else {
-                        header("Location: index.php?menu=reservasi&success=" . $successMessage);
-                        exit;
-                    }
-                } else {
-                    $errMessage = "Incorrect username and password";
-                    header("Location: index.php?menu=login&message=" . $errMessage);
-                    exit;
-                }
+            $successMessage = "Login successfully";
+            $_SESSION['username'] = $staff->getUsername();
+            $_SESSION['posisi'] = $staff->getPosisi();
+            $successMessage = "Login successfully! Welcome Back, " . $staff->getNamaStaff() . "!";
+            if ($staff->getPosisi() == "Manager") {
+                header("Location: index.php?menu=staff&success=" . $successMessage);
+                exit;
             } else {
-                $errMessage = "Incorrect username and password";
-                header("Location: index.php?menu=login&message=" . $errMessage . "&username=" . $username . "&password=" . $password);
+                header("Location: index.php?menu=reservasi&success=" . $successMessage);
                 exit;
             }
         }
@@ -72,6 +70,7 @@ class StaffController
     }
     public function store() : void
     {
+        // Get from POST
         $username = trim(filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING));
         $password = $_POST['password'];
         $confirm_password = $_POST['password_confirm'];
@@ -81,7 +80,7 @@ class StaffController
         $status_akun = $_POST['status_akun'];
         $staff = $this->staffServices->getOneStaffByUsername($username);
         $errMessage = "";
-        // 2. Comprehensive Validation
+        // VALIDATE
         if (empty($username) || empty($password) || empty($confirm_password) || empty($posisi) || empty($email) || empty($nama_staff) || empty($status_akun)) {
             $errMessage = "Please fill all required fields with valid data.";
         } 
@@ -97,6 +96,7 @@ class StaffController
         if (!empty($errMessage)) {
             header("Location: index.php?menu=staff-add&message=" . $errMessage);
             exit;
+        // EXEC
         } else {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $staff = new Staff();
@@ -106,12 +106,13 @@ class StaffController
             $staff->setNamaStaff($nama_staff);
             $staff->setPosisi($posisi);
             $staff->setStatusAkun($status_akun);
-            if ($this->staffServices->addStaff($staff)) {
+            $result = $this->staffServices->addStaff($staff);
+            if ($result) {
                 $successMessage = "Staff created successfully.";
                 header("Location: index.php?menu=staff&success=" . $successMessage);
                 exit;
             } else {
-                $errMessage = "Failed to create staff.";
+                $errMessage = "Something went wrong.";
                 header("Location: index.php?menu=staff-add&message=" . $errMessage);
                 exit;
             }
@@ -135,7 +136,8 @@ class StaffController
     }
 
     public function update() : void
-    {
+    {   
+        // Get from POST
         $staff_id = filter_input(INPUT_POST, 'staff_id', FILTER_SANITIZE_STRING);
         $username = trim(filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING));
         $old_password = $_POST['old_password'];
@@ -147,7 +149,7 @@ class StaffController
         $status_akun = $_POST['status_akun'];
         $staff = $this->staffServices->getOneStaffByUsername($username);
         $errMessage = "";
-        // 2. Comprehensive Validation
+        // VALIDATE
         if (empty($staff_id) || empty($username) || empty($old_password) || empty($posisi) || empty($email) || empty($nama_staff) || empty($status_akun)) {
             $errMessage = "Please fill all required fields with valid data.";
         } 
@@ -171,6 +173,7 @@ class StaffController
         if (!empty($errMessage)) {
             header("Location: index.php?menu=staff-edit&staff_id=" . $staff_id . "&message=" . $errMessage);
             exit;
+        // EXEC
         } else {
             $currentStaff = $this->staffServices->getOneStaff($staff_id);
             if ($currentStaff && $currentStaff->getUsername() === $username && $currentStaff->getEmail() === $email && $currentStaff->getNamaStaff() === $nama_staff && $currentStaff->getPosisi() === $posisi && $currentStaff->getStatusAkun() === $status_akun && $currentStaff->getPasswordHash() === $hashedPassword) {
@@ -178,7 +181,6 @@ class StaffController
                 header("Location: index.php?menu=staff&success=" . $successMessage);
                 exit;
             }
-
             $staff = new Staff();
             $staff->setStaffId($staff_id);
             $staff->setUsername($username);
@@ -187,13 +189,44 @@ class StaffController
             $staff->setNamaStaff($nama_staff);
             $staff->setPosisi($posisi);
             $staff->setStatusAkun($status_akun);
-            if ($this->staffServices->updateStaff($staff)) {
+            $result = $this->staffServices->updateStaff($staff);
+            if ($result) {
                 $successMessage = "Staff edited successfully.";
                 header("Location: index.php?menu=staff&success=" . $successMessage);
                 exit;
             } else {
-                $errMessage = "Failed to edit staff.";
+                $errMessage = "Something went wrong.";
                 header("Location: index.php?menu=staff-edit&staff_id=" . $staff_id . "&message=" . $errMessage);
+                exit;
+            }
+        }
+    }
+    public function delete() : void
+    {
+        // Get from POST
+        $staff_id = filter_input(INPUT_POST, 'staff_id', FILTER_SANITIZE_STRING);
+        $staff = $this->staffServices->getOneStaff($staff_id);
+        $errMessage = "";
+        // VALIDATE
+        if (!$staff) {
+            $errMessage = "Staff not found.";
+        }
+        elseif ($staff->getUsername() == $_SESSION['username']) {
+            $errMessage = "You cannot delete your own account.";
+        }
+        if (empty($errMessage)) {
+            header("Location: index.php?menu=staff&message=" . $errMessage);
+            exit;
+        // EXEC
+        } else {
+            $result = $this->staffServices->deleteStaff($staff_id);
+            if ($result) {
+                $successMessage = "Staff deleted successfully";
+                header("location: index.php?menu=staff&success=" . $successMessage);
+                exit;
+            } else {
+                $errMessage = "Something went wrong.";
+                header("location: index.php?menu=staff&message=" . $errMessage);
                 exit;
             }
         }
