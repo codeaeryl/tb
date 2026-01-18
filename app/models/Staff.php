@@ -8,8 +8,7 @@ class Staff
     private string $email;
     private string $nama_staff;
     private string $posisi;
-    private	string $hire_date;
-    private ?string $resign_date;
+    private	string $status_akun;
 
     public function getStaffId(): string
     {
@@ -71,23 +70,13 @@ class Staff
         $this->posisi = $posisi;
     }
 
-    public function getHireDate(): string
+    public function getStatusAkun(): string
     {
-        return $this->hire_date;
+        return $this->status_akun;
     }
-
-    public function setHireDate(string $hire_date): void
+    
+    public function setStatusAkun(string $status_akun): void
     {
-        $this->hire_date = $hire_date;
-    }
-
-    public function getResignDate(): ?string
-    {
-        return $this->resign_date;
-    }
-
-    public function setResignDate(?string $resign_date): void
-    {
-        $this->resign_date = $resign_date;
+        $this->status_akun = $status_akun;
     }
 }

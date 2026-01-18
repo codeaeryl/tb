@@ -10,6 +10,7 @@
   --secondary-text-clr: #b0b3c1;
   --edit-btn-clr: #a85f1b;
   --danger-clr: #ff4d4d;
+  --success-clr: #198754;
   --table-header-bg: #242636;
   --table-stripe-bg: #181924;
   --table-hover-bg: #2e3245;
@@ -177,12 +178,14 @@ main{
 
 .btn-container{
   display: flex;
-  gap: 1%;
+  gap: 5px;
   justify-content: center;
   align-items: center;
+  padding: 5px;
 }
 
 .add-btn {
+  text-decoration: none;
   font-weight: bold;
   text-align: center;
   padding: 10px;
@@ -194,6 +197,7 @@ main{
 }
 
 .edit-btn {
+  text-decoration: none;
   font-weight: bold;
   text-align: center;
   padding: 10px;
@@ -201,10 +205,12 @@ main{
   background-color: var(--edit-btn-clr);
   color: var(--text-clr);
   border: none;
-  width: 48%
+  min-width: 40%;
 }
 
 .delete-btn {
+  font: inherit;
+  text-decoration: none;
   font-weight: bold;
   text-align: center;
   padding: 10px;
@@ -212,7 +218,7 @@ main{
   background-color: var(--danger-clr);
   color: var(--text-clr);
   border: none;
-  width: 48%
+  min-width: 40%
 }
 
 header {
@@ -224,6 +230,40 @@ header {
   align-items: center;
   gap: 1em;
   border-bottom: 2px solid var(--line-clr);
+}
+
+.suc-msg {
+  display: flex;
+  align-items: center;
+  color: var(--success-clr);
+  border: 1px solid var(--success-clr);
+  padding: 10px;
+  border-radius: 8px;
+  background-color: rgba(77, 255, 77, 0.1);
+  text-align: center;
+  font-weight: 500;
+  margin-bottom: 1em;
+  svg {
+    fill: var(--success-clr);
+    margin-right: 10px;
+  }
+}
+
+.err-msg {
+  display: flex;
+  align-items: center;
+  color: var(--danger-clr);
+  border: 1px solid var(--danger-clr);
+  padding: 10px;
+  border-radius: 8px;
+  background-color: rgba(255, 77, 77, 0.1);
+  text-align: center;
+  font-weight: 500;
+  margin-bottom: 1em;
+  svg {
+    fill: var(--danger-clr);
+    margin-right: 10px;
+  }
 }
 
 table {

@@ -15,9 +15,30 @@ switch ($menu) {
     case 'logout':
         $controller = new StaffController();
         $controller->logout();
+        break;
     case 'staff':
         $controller = new StaffController();
         $controller->index();
+        break;
+    case 'staff-add':
+        $controller = new StaffController();
+        $controller->create();
+        break;
+    case 'staff-store':
+        $controller = new StaffController();
+        $controller->store();
+        break;
+    case 'staff-edit':
+        $controller = new StaffController();
+        $controller->edit();
+        break;
+    case 'staff-update':
+        $controller = new StaffController();
+        $controller->update();
+        break;
+    case 'staff-delete':
+        $controller = new StaffController();
+        $controller->delete();
         break;
     default:
         $controller = new StaffController();

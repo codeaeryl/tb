@@ -9,13 +9,12 @@ USE db_hotel;
 CREATE TABLE staff (
     -- format: 13XXXX (XXXX is a 4-digit number)
     staff_id VARCHAR(6) PRIMARY KEY,
-    username VARCHAR(32) UNIQUE NOT NULL,
+    username VARCHAR(32) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     email VARCHAR(50) UNIQUE NOT NULL,
     nama_staff VARCHAR(100) NOT NULL,
     posisi ENUM('Manager', 'Staff') NOT NULL,
-    hire_date DATE NOT NULL,
-    resign_date DATE
+    status_akun ENUM('Active', 'Not Active') NOT NULL
 );
 
 CREATE TABLE tipe_kamar (
@@ -79,24 +78,6 @@ CREATE TABLE detail_reservasi (
     FOREIGN KEY (nomor_kamar) REFERENCES kamar(nomor_kamar)
 );
 
-CREATE TABLE akomodasi_extra (
-    -- format: A-XXX (XXXX is a 3-digit number)
-    id_akomodasi VARCHAR(5) PRIMARY KEY,
-    nama_akomodasi VARCHAR(50) NOT NULL,
-    desc_akomodasi TEXT NOT NULL,
-    harga_akomodasi DECIMAL(19,4) NOT NULL,
-    stok INT NOT NULL
-);
-
-CREATE TABLE detail_akomodasi_extra (
-    id_reservasi VARCHAR(13) NOT NULL,
-    id_akomodasi VARCHAR(5) NOT NULL,
-    quantity INT NOT NULL,
-    CONSTRAINT pk_detail_akomodasi_extra PRIMARY KEY (id_reservasi, id_akomodasi),
-    FOREIGN KEY (id_reservasi) REFERENCES reservasi(id_reservasi),
-    FOREIGN KEY (id_akomodasi) REFERENCES akomodasi_extra(id_akomodasi)
-);
-
 CREATE TABLE diskon_reservasi_awal (
     -- jumlah_hari: number of days in advance to book
     jumlah_hari INT PRIMARY KEY,
@@ -128,10 +109,10 @@ CREATE TABLE log_staff_activity (
 -- Data Initialization
 -- =============================================
 -- Staff (Using your 13XXXX format)
-INSERT INTO staff (staff_id, username, password_hash, email, nama_staff, posisi, hire_date) VALUES
+INSERT INTO staff (staff_id, username, password_hash, email, nama_staff, posisi, status_akun) VALUES
 -- eko pwd = Manager#1234, siti pwd = Staff#1234
-                                                                                                ('130001', 'eko', '$2y$10$izDbv2rB5fMmfrm/7SzmbeP0uRX3ZhffauggIVM.ifRxG6jXMGZzu', 'eko@hotel.com', 'Eko Susilo', 'Manager', '2023-01-10'),
-                                                                                                ('130002', 'siti', '$2y$10$RRSmxEa0o4vDCKaV0Rxc0.l/X6mvr6/JwCahVhk0S66iTykFvb4i2', 'siti@hotel.com', 'Siti Aminah', 'Staff', '2024-05-20');
+                                                                                                ('130001', 'eko', '$2y$10$izDbv2rB5fMmfrm/7SzmbeP0uRX3ZhffauggIVM.ifRxG6jXMGZzu', 'eko@hotel.com', 'Eko Susilo', 'Manager', 'Active'),
+                                                                                                ('130002', 'siti', '$2y$10$RRSmxEa0o4vDCKaV0Rxc0.l/X6mvr6/JwCahVhk0S66iTykFvb4i2', 'siti@hotel.com', 'Siti Aminah', 'Staff', 'Active');
 
 -- ==========================================
 -- VIEWS
@@ -162,15 +143,14 @@ END //
 DELIMITER ;
 
 DELIMITER //
-DELIMITER //
 
 CREATE PROCEDURE sp_staff_insert(
     IN p_username VARCHAR(32),
     IN p_password_hash VARCHAR(255),
     IN p_email VARCHAR(50),
     IN p_nama_staff VARCHAR(100),
-    IN p_posisi VARCHAR(50),
-    IN p_hire_date DATE,
+    IN p_posisi ENUM('Manager', 'Staff'),
+    IN p_status_akun ENUM('Active', 'Not Active'),
     IN p_user VARCHAR(32)
 )
 BEGIN
@@ -179,34 +159,34 @@ BEGIN
     SET @current_conn_user = p_user;
     SET next_id = fn_get_next_staff_id();
 
-    INSERT INTO staff (staff_id, username, password_hash, email, nama_staff, posisi, hire_date)
-    VALUES (next_id, p_username, p_password_hash, p_email, p_nama_staff, p_posisi, p_hire_date);
-    
-    SELECT next_id AS new_staff_id;
+    INSERT INTO staff (staff_id, username, password_hash, email, nama_staff, posisi, status_akun)
+    VALUES (next_id, p_username, p_password_hash, p_email, p_nama_staff, p_posisi, p_status_akun);
 END //
 
-CREATE PROCEDURE sp_update_staff(
+CREATE PROCEDURE sp_staff_update (
     IN p_staff_id VARCHAR(6),
+    IN p_username VARCHAR(32),
+    IN p_password_hash VARCHAR(255),
     IN p_email VARCHAR(50),
     IN p_nama_staff VARCHAR(100),
-    IN p_posisi VARCHAR(7),
-    IN p_resign_date DATE,
+    IN p_posisi ENUM('Manager', 'Staff'),
+    IN p_status_akun ENUM('Active', 'Not Active'),
     IN p_user VARCHAR(32)
 )
 BEGIN
     SET @current_conn_user = p_user;
 
     UPDATE staff 
-    SET email = p_email,
+    SET username = p_username,
+        password_hash = p_password_hash,
+        email = p_email,
         nama_staff = p_nama_staff,
         posisi = p_posisi,
-        resign_date = p_resign_date
+        status_akun = p_status_akun
     WHERE staff_id = p_staff_id;
-    
-    SELECT ROW_COUNT() AS rows_affected;
 END //
 
-CREATE PROCEDURE sp_delete_staff(
+CREATE PROCEDURE sp_staff_delete (
     IN p_staff_id VARCHAR(6),
     IN p_user VARCHAR(32)
 )
@@ -216,23 +196,14 @@ BEGIN
 
     SET @current_conn_user = p_user;
 
-    -- 1. Get the username for the given staff_id
     SELECT username INTO v_username FROM staff WHERE staff_id = p_staff_id;
 
-    -- 2. Check if the staff exists in log_staff_activity
     SELECT COUNT(*) INTO activity_count 
     FROM log_staff_activity 
     WHERE user_staff = v_username;
 
-    -- 3. Conditional Logic
-    IF activity_count > 0 THEN
-        -- Option A: Prevent Deletion
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = 'Cannot delete staff: Active logs found in log_staff_activity. Consider setting a resign_date instead.';
-    ELSE
-        -- Option B: Proceed with deletion
+    IF activity_count = 0 THEN
         DELETE FROM staff WHERE staff_id = p_staff_id;
-        SELECT 'Staff deleted successfully' AS result;
     END IF;
 END //
 
@@ -247,7 +218,7 @@ BEGIN
         SET @current_conn_user = 'SYSTEM';
     END IF;
     INSERT INTO log_staff_activity (user_staff, activity_desc)
-    VALUES (CAST(COALESCE(@current_conn_user, 'SYSTEM') AS VARCHAR(32)), CONCAT('Staff account created for ', NEW.username));
+    VALUES (CAST(COALESCE(@current_conn_user, 'SYSTEM') AS VARCHAR(32)), CONCAT('Staff account created for ', NEW.staff_id, " with username ", NEW.username, " and email ", NEW.email));
 END //
 
 CREATE TRIGGER trg_log_update_staff
@@ -255,7 +226,7 @@ AFTER UPDATE ON staff
 FOR EACH ROW
 BEGIN
     INSERT INTO log_staff_activity (user_staff, activity_desc)
-    VALUES (CAST(COALESCE(@current_conn_user, 'SYSTEM') AS VARCHAR(32)), CONCAT('Staff account updated for ', NEW.username));
+    VALUES (CAST(COALESCE(@current_conn_user, 'SYSTEM') AS VARCHAR(32)), CONCAT('Staff account updated for ', OLD.staff_id, " with username ", OLD.username, " and email ", OLD.email, " to ", NEW.username, " and ", NEW.email, " respectively"));
 END //
 
 CREATE TRIGGER trg_log_delete_staff
@@ -263,6 +234,6 @@ AFTER DELETE ON staff
 FOR EACH ROW
 BEGIN
     INSERT INTO log_staff_activity (user_staff, activity_desc)
-    VALUES (CAST(COALESCE(@current_conn_user, 'SYSTEM') AS VARCHAR(32)), CONCAT('Staff account deleted for ', OLD.username));
+    VALUES (CAST(COALESCE(@current_conn_user, 'SYSTEM') AS VARCHAR(32)), CONCAT('Staff account deleted for ', OLD.staff_id, " with username ", OLD.username, " and email ", OLD.email));
 END //
 DELIMITER ;
