@@ -214,7 +214,7 @@ class StaffController
         elseif ($staff->getUsername() == $_SESSION['username']) {
             $errMessage = "You cannot delete your own account.";
         }
-        if (empty($errMessage)) {
+        if (!empty($errMessage)) {
             header("Location: index.php?menu=staff&message=" . $errMessage);
             exit;
         // EXEC
