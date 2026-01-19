@@ -1,5 +1,5 @@
 <?php
-if (!isset($_SESSION['username']) && $_SESSION['posisi']!="Manager") {
+if (!isset($_SESSION['username']) || $_SESSION['posisi']!="Manager") {
     header("Location: index.php?menu=login");
     exit;
 }
@@ -46,12 +46,10 @@ if (!isset($_SESSION['username']) && $_SESSION['posisi']!="Manager") {
             <ul class="sub-menu">
                 <div>
                     <li><a href="index.php?menu=staff" class="table-link">Staff</a></li>
-                    <li><a href="index.php?menu=promo" class="table-link">Kode Promo</a></li>
                     <li><a href="index.php?menu=log_staff_activity" class="table-link">Log Staff Activity</a></li>
                 </div>
             </ul>
         </li>
-        <!-- Reservations btn -->
         <li>
             <a href="index.php?menu=laporan-bor" class="table-link">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M80-200v-240q0-27 11-49t29-39v-112q0-50 35-85t85-35h160q23 0 43 8.5t37 23.5q17-15 37-23.5t43-8.5h160q50 0 85 35t35 85v112q18 17 29 39t11 49v240h-80v-80H160v80H80Zm440-360h240v-80q0-17-11.5-28.5T720-680H560q-17 0-28.5 11.5T520-640v80Zm-320 0h240v-80q0-17-11.5-28.5T400-680H240q-17 0-28.5 11.5T200-640v80Zm-40 200h640v-80q0-17-11.5-28.5T760-480H200q-17 0-28.5 11.5T160-440v80Zm640 0H160h640Z"/></svg>
@@ -74,7 +72,7 @@ if (!isset($_SESSION['username']) && $_SESSION['posisi']!="Manager") {
         <li>
             <a href="index.php?menu=kamar-populer" class="table-link">
                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M120-120v-80h80v-640h400v40h160v240h-80v-160h-80v240h-80v-280H280v560h200v80H120Zm560 40-12-60q-12-5-22.5-11T625-165l-58 20-40-69 45-40q-2-15-2-25.5t2-25.5l-45-40 40-69 58 20q10-8 20.5-14.5T668-420l12-60h80l12 60q12 5 22.5 11t20.5 14l58-20 40 69-45 40q2 15 2 25.5t-2 25.5l45 40-40 69-58-19q-10 8-20.5 14T772-140l-12 60h-80Zm40-120q33 0 56.5-23.5T800-280q0-33-23.5-56.5T720-360q-33 0-56.5 23.5T640-280q0 33 23.5 56.5T720-200ZM440-440q-17 0-28.5-11.5T400-480q0-17 11.5-28.5T440-520q17 0 28.5 11.5T480-480q0 17-11.5 28.5T440-440ZM280-200v-560 560Z"/></svg>
-                <span>Laporan Tipe Kamar Populer</span>
+                <span>Laporan TK Populer</span>
             </a>
         </li>
         </li>
@@ -90,6 +88,7 @@ if (!isset($_SESSION['username']) && $_SESSION['posisi']!="Manager") {
 <main style="position: relative;">
     <header>
         <h1>Nadine Hotel Manager</h1>
+        <p>Account: <?php echo $_SESSION['username']?></p>
     </header>
     <div class="container">
         <h1>Edit Staff <?=$staff->getStaffId()?></h1>

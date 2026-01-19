@@ -31,10 +31,10 @@ class StaffController
         // VALIDATE
         if (empty($username) || empty($password)) {
             $errMessage = "Please fill all required fields.";
-        } elseif (!$staff && $staff->getUsername() == null) {
+        } elseif (!$staff || $staff->getUsername() == null) {
             $errMessage = "Incorrect username and password.";
         }
-       elseif ($staff->getStatusAkun() != "Active" && !password_verify($password, $staff->getPasswordHash())) {
+       elseif ($staff->getStatusAkun() != "Active" || !password_verify($password, $staff->getPasswordHash())) {
             $errMessage = "Incorrect username and password.";
         }
         if (!empty($errMessage)) {
@@ -177,8 +177,8 @@ class StaffController
         } else {
             $currentStaff = $this->staffServices->getOneStaff($staff_id);
             if ($currentStaff && $currentStaff->getUsername() === $username && $currentStaff->getEmail() === $email && $currentStaff->getNamaStaff() === $nama_staff && $currentStaff->getPosisi() === $posisi && $currentStaff->getStatusAkun() === $status_akun && $currentStaff->getPasswordHash() === $hashedPassword) {
-                $successMessage = "No changes made.";
-                header("Location: index.php?menu=staff&success=" . $successMessage);
+                $errMessage = "No changes made.";
+                header("Location: index.php?menu=staff&message=" . $errMessage);
                 exit;
             }
             $staff = new Staff();
